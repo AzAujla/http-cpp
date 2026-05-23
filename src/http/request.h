@@ -10,6 +10,7 @@ private:
   std::string uri;
   std::unordered_map<std::string, std::string> headers;
   std::string body = "";
+  std::unordered_map<std::string, std::string> params;
 
 public:
   Cookies cookies;
@@ -28,6 +29,9 @@ public:
   std::unordered_map<std::string, std::string> get_headers() const;
   std::string get_header(const std::string &key) const;
   std::string get_body() const;
+
+  Request &set_param(const std::string &key, const std::string &value);
+  std::string get_param(const std::string &key) const;
 
   static Request from_string(const std::string &raw);
 };

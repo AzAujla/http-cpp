@@ -24,5 +24,6 @@ public:
   Cookies cookies;
   Response();
   std::string build();
+  Response &set_code(HttpResponseCode code);
   Response &set_body(std::string);
 };

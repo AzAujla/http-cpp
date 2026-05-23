@@ -18,6 +18,11 @@ Response &Response::set_body(std::string text) {
   return *this;
 }
 
+Response &Response::set_code(HttpResponseCode code) {
+  this->code = code;
+  return *this;
+}
+
 std::string Response::build() {
   std::string response;
 
