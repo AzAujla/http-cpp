@@ -1,0 +1,9 @@
+/mnt/d/coding/cpp/http/build/CMakeFiles/server.dir
+/mnt/d/coding/cpp/http/build/CMakeFiles/edit_cache.dir
+/mnt/d/coding/cpp/http/build/CMakeFiles/rebuild_cache.dir
+/mnt/d/coding/cpp/http/build/src/app/CMakeFiles/app.dir
+/mnt/d/coding/cpp/http/build/src/app/CMakeFiles/edit_cache.dir
+/mnt/d/coding/cpp/http/build/src/app/CMakeFiles/rebuild_cache.dir
+/mnt/d/coding/cpp/http/build/src/http/CMakeFiles/http.dir
+/mnt/d/coding/cpp/http/build/src/http/CMakeFiles/edit_cache.dir
+/mnt/d/coding/cpp/http/build/src/http/CMakeFiles/rebuild_cache.dir
