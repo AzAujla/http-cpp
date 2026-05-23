@@ -322,7 +322,7 @@ const std::unordered_map<std::string, HttpMethod> method_map = {
     {"PATCH", HttpMethod::Patch},
 };
 
-HttpMethod method_from_string(std::string &method) {
+HttpMethod method_from_string(const std::string &method) {
   auto it = method_map.find(method);
   return it != method_map.end() ? it->second : HttpMethod::Get;
 }

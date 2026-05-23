@@ -1,4 +1,5 @@
 #include "response.h"
+#include "../utils/strings.h"
 #include "http.h"
 #include <string>
 #include <unordered_map>
@@ -25,7 +26,10 @@ std::string Response::build() {
   response += status_code_to_string(code) + "\r\n";
 
   for (auto &[key, value] : headers) {
-    response += key + ": " + value + "\r\n";
+    response += sanitize(key) + ": " + sanitize(value) + "\r\n";
+  }
+  for (auto &[key, cookie] : cookies.all()) {
+    response += "Set-Cookie: " + cookie.to_header() + "\r\n";
   }
 
   response += "\r\n";

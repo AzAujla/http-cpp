@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cookies.h"
 #include "http.h"
 #include <string>
 #include <unordered_map>
@@ -20,6 +21,7 @@ public:
    * HTTP/1.1 200 OK
    * Connection: Close
    */
+  Cookies cookies;
   Response();
   std::string build();
   Response &set_body(std::string);

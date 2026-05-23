@@ -91,4 +91,4 @@ enum class HttpMethod : std::uint8_t {
   Patch = 8
 };
 std::string method_to_string(HttpMethod);
-HttpMethod method_from_string(std::string &method);
+HttpMethod method_from_string(const std::string &method);

@@ -83,5 +83,11 @@ Request Request::from_string(const std::string &raw) {
     req.body += body_line + "\n";
   }
 
+  // request.cpp — in from_string, after parsing headers
+  auto cookie_header = req.get_header("Cookie");
+  if (!cookie_header.empty()) {
+    req.cookies = Cookies::from_header(cookie_header);
+  }
+
   return req;
 }

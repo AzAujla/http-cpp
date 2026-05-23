@@ -1,4 +1,5 @@
 #pragma once
+#include "cookies.h"
 #include "http.h"
 #include <unordered_map>
 
@@ -11,6 +12,8 @@ private:
   std::string body = "";
 
 public:
+  Cookies cookies;
+
   Request &set_method(HttpMethod method);
   Request &set_version(Httpversion version);
   Request &set_uri(const std::string &uri);
