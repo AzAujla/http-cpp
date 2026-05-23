@@ -42,6 +42,7 @@ Cookie &Cookie::set_same_site(const std::string &s) {
 }
 
 std::string Cookie::get_key() const { return key; }
+std::string Cookie::get_value() const { return value; }
 
 std::string Cookie::to_header() const {
   std::ostringstream ss;

@@ -29,7 +29,8 @@ public:
   Cookie &set_same_site(const std::string &same_site);
 
   std::string get_key() const;
-  std::string to_header() const; // serializes to Set-Cookie header value
+  std::string get_value() const;
+  std::string to_header() const;
 };
 
 class Cookies {

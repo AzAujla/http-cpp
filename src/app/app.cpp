@@ -9,9 +9,6 @@
 #include <thread>
 #include <unistd.h>
 
-extern const std::string RESPONSE =
-    Response().set_body("Hello World!\n").build();
-
 Server &Server::default_server() {
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = INADDR_ANY; // 0.0.0.0
@@ -54,7 +51,16 @@ void Server::handle_client(int client_fd, sockaddr_in client_addr) {
     }
 #endif // !NDEBUG
 
-    send(client_fd, RESPONSE.c_str(), RESPONSE.size(), 0);
+    Response response = Response();
+    if (request.cookies.has("Auth")) {
+      response.set_body("Authenticated with " +
+                        request.cookies.get("Auth").get_value() + "\n");
+    } else {
+      response.set_body("Please login\n");
+    }
+
+    std::string response_str = response.build();
+    send(client_fd, response_str.c_str(), response_str.size(), 0);
   }
   close(client_fd);
 }
