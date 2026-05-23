@@ -75,11 +75,6 @@ enum class Httpversion : std::uint8_t {
   HTTP_2_1 = 3,
   HTTP_3_0 = 4,
 };
-static const std::unordered_map<std::string, Httpversion> version_map = {
-    {"HTTP/1.0", Httpversion::HTTP_1_0}, {"HTTP/1.1", Httpversion::HTTP_1_1},
-    {"HTTP/2.0", Httpversion::HTTP_2_0}, {"HTTP/2.1", Httpversion::HTTP_2_1},
-    {"HTTP/3.0", Httpversion::HTTP_3_0},
-};
 
 std::string version_to_string(Httpversion);
 Httpversion version_from_string(const std::string &version);
@@ -94,13 +89,6 @@ enum class HttpMethod : std::uint8_t {
   Options = 6,
   Trace = 7,
   Patch = 8
-};
-const std::unordered_map<std::string, HttpMethod> method_map = {
-    {"GET", HttpMethod::Get},         {"POST", HttpMethod::Post},
-    {"PUT", HttpMethod::Put},         {"DELETE", HttpMethod::Delete},
-    {"HEAD", HttpMethod::Head},       {"CONNECT", HttpMethod::Connect},
-    {"OPTIONS", HttpMethod::Options}, {"TRACE", HttpMethod::Trace},
-    {"PATCH", HttpMethod::Patch},
 };
 std::string method_to_string(HttpMethod);
 HttpMethod method_from_string(std::string &method);

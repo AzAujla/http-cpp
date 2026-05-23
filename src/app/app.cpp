@@ -2,7 +2,6 @@
 #include "../http/request.h"
 #include "../http/response.h"
 #include <arpa/inet.h>
-#include <cstddef>
 #include <iostream>
 #include <mutex>
 #include <netinet/in.h>
@@ -10,12 +9,10 @@
 #include <thread>
 #include <unistd.h>
 
-const extern std::string RESPONSE =
+extern const std::string RESPONSE =
     Response().set_body("Hello World!\n").build();
 
 Server &Server::default_server() {
-  port = 8000;
-  addr = {};
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = INADDR_ANY; // 0.0.0.0
   addr.sin_port = htons(this->port);
@@ -42,15 +39,21 @@ std::mutex Server::cout_mutex;
 
 void Server::handle_client(int client_fd, sockaddr_in client_addr) {
   char buffer[4096] = {};
-  size_t bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+  ssize_t bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
 
   if (bytes > 0) {
-    std::lock_guard<std::mutex> lock(cout_mutex);
     const Request request = Request::from_string(buffer);
 
-    std::cout << inet_ntoa(client_addr.sin_addr) << " "
-              << method_to_string(request.get_method()) << " "
-              << request.get_uri() << "\n";
+#ifndef NDEBUG
+    {
+      std::lock_guard<std::mutex> lock(cout_mutex);
+
+      std::cout << inet_ntoa(client_addr.sin_addr) << " "
+                << method_to_string(request.get_method()) << " "
+                << request.get_uri() << "\n";
+    }
+#endif // !NDEBUG
+
     send(client_fd, RESPONSE.c_str(), RESPONSE.size(), 0);
   }
   close(client_fd);

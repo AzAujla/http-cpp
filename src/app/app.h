@@ -12,10 +12,10 @@
  */
 class Server {
 private:
-  int port;
-  sockaddr_in addr;
-  bool retry_port_bind;
-  int retries_for_port;
+  int port = 8000;
+  sockaddr_in addr = {};
+  bool retry_port_bind = false;
+  int retries_for_port = 5;
   static std::mutex cout_mutex;
   static void handle_client(int, sockaddr_in);
 
