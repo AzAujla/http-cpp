@@ -1,0 +1,23 @@
+# Build directory
+build/
+
+# Compiled binaries
+server
+*.o
+*.a
+*.so
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Editor
+.cache/
+compile_commands.json
+
+# OS
+.DS_Store
+Thumbs.db
