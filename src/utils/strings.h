@@ -19,3 +19,19 @@ inline std::string sanitize_cookie_key(const std::string &input) {
   }
   return out;
 }
+
+inline std::string url_decode(const std::string &input) {
+  std::string out;
+  for (size_t i = 0; i < input.size(); i++) {
+    if (input[i] == '+') {
+      out += ' ';
+    } else if (input[i] == '%' && i + 2 < input.size()) {
+      int hex = std::stoi(input.substr(i + 1, 2), nullptr, 16);
+      out += static_cast<char>(hex);
+      i += 2;
+    } else {
+      out += input[i];
+    }
+  }
+  return out;
+}

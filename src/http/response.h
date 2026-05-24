@@ -22,8 +22,12 @@ public:
    * Connection: Close
    */
   Cookies cookies;
+
   Response();
   std::string build();
   Response &set_code(HttpResponseCode code);
+  Response &set_version(Httpversion v);
+  HttpResponseCode get_code() const;
+  Httpversion get_version() const;
   Response &set_body(std::string);
 };

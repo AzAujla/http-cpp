@@ -16,38 +16,43 @@ using Handler =
 
 class Route : public std::enable_shared_from_this<Route> {
 
+  struct HttpMethodHash {
+    size_t operator()(HttpMethod m) const {
+      return std::hash<uint8_t>()(static_cast<uint8_t>(m));
+    }
+  };
+
 private:
   std::string uri;
   bool optional;
   bool param;
-  std::optional<HttpMethod> method;
-  std::optional<Handler> handler;
+  std::unordered_map<HttpMethod, Handler, HttpMethodHash> handlers;
   std::unordered_map<std::string, std::shared_ptr<Route>> children;
   std::unordered_map<std::string, std::shared_ptr<Route>> param_children;
   std::unordered_map<std::string, std::shared_ptr<Route>> optional_children;
 
-  std::shared_ptr<Route>
+  std::shared_ptr<const Route>
   match_segments(const std::vector<std::string> &segments, size_t index,
-                 std::unordered_map<std::string, std::string> &params);
+                 std::unordered_map<std::string, std::string> &params) const;
   friend class Router;
 
 public:
   void insert(HttpMethod method, const std::string &path, Handler handler);
-  std::shared_ptr<Route>
+  std::shared_ptr<const Route>
   match(const std::string &path,
-        std::unordered_map<std::string, std::string> &params);
+        std::unordered_map<std::string, std::string> &params) const;
   Route(const std::string &uri, bool optional = false, bool param = false);
 };
 
 class Router {
 private:
   std::shared_ptr<Route> root;
-  Response dispatch(Handler &handler, Request req);
+  Response dispatch(const Handler &handler, Request req) const;
 
 public:
   Router();
 
-  Response handle(Request request);
+  Response handle(Request request) const;
   Router &add_route(HttpMethod method, const std::string &uri, Handler handler);
 
   Router &get(const std::string &uri, Handler handler);

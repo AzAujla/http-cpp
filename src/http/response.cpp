@@ -23,6 +23,15 @@ Response &Response::set_code(HttpResponseCode code) {
   return *this;
 }
 
+Response &Response::set_version(Httpversion v) {
+  version = v;
+  return *this;
+}
+
+HttpResponseCode Response::get_code() const { return code; }
+
+Httpversion Response::get_version() const { return version; }
+
 std::string Response::build() {
   std::string response;
 

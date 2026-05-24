@@ -22,6 +22,12 @@ Route::Route(const std::string &uri, bool optional, bool param)
 void Route::insert(HttpMethod method, const std::string &path,
                    Handler handler) {
   std::vector<std::string> segments = split_path(path);
+
+  if (segments.empty()) {
+    handlers[method] = handler;
+    return;
+  }
+
   Route *current = this;
   bool seen_optional = false; // ← track if we've seen an optional
 
@@ -62,31 +68,30 @@ void Route::insert(HttpMethod method, const std::string &path,
     }
 
     if (is_last) {
-      current->method = method;
-      current->handler = handler;
+      current->handlers[method] = handler;
     }
   }
 }
 
-std::shared_ptr<Route>
+std::shared_ptr<const Route>
 Route::match(const std::string &path,
-             std::unordered_map<std::string, std::string> &params) {
+             std::unordered_map<std::string, std::string> &params) const {
   std::vector<std::string> segments = split_path(path);
   return match_segments(segments, 0, params);
 }
 
-std::shared_ptr<Route>
-Route::match_segments(const std::vector<std::string> &segments, size_t index,
-                      std::unordered_map<std::string, std::string> &params) {
+std::shared_ptr<const Route> Route::match_segments(
+    const std::vector<std::string> &segments, size_t index,
+    std::unordered_map<std::string, std::string> &params) const {
   // Consumed all segments
   if (index == segments.size()) {
-    if (handler.has_value())
+    if (!handlers.empty())
       return shared_from_this();
 
     // Even if this node has no handler, check if any optional
     // children have a handler — since they can be skipped
     for (auto &[key, child] : optional_children) {
-      if (child->handler.has_value())
+      if (!child->handlers.empty())
         return child;
     }
 
@@ -142,7 +147,7 @@ Router &Router::add_route(HttpMethod method, const std::string &uri,
   return *this;
 }
 
-Response Router::dispatch(Handler &handler, Request req) {
+Response Router::dispatch(const Handler &handler, Request req) const {
   return std::visit(
       [&](auto &&fn) -> Response {
         using T = std::decay_t<decltype(fn)>;
@@ -160,21 +165,21 @@ Response Router::dispatch(Handler &handler, Request req) {
       handler);
 }
 
-Response Router::handle(Request request) {
+Response Router::handle(Request request) const {
   std::unordered_map<std::string, std::string> params;
-  auto route = root->match(request.get_uri(), params);
+  std::shared_ptr<const Route> route = root->match(request.get_uri(), params);
 
   if (!route) {
     return Response()
         .set_code(HttpResponseCode::NotFound)
-        .set_body("404 Not Found");
+        .set_body("404 Not Found\n");
   }
 
-  if (!route->method.has_value() ||
-      route->method.value() != request.get_method()) {
+  auto it = route->handlers.find(request.get_method());
+  if (it == route->handlers.end()) {
     return Response()
         .set_code(HttpResponseCode::MethodNotAllowed)
-        .set_body("405 Method Not Allowed");
+        .set_body("405 Method Not Allowed\n");
   }
 
   // Inject params into request
@@ -182,7 +187,7 @@ Response Router::handle(Request request) {
     request.set_param(key, value);
   }
 
-  return dispatch(*route->handler, request);
+  return dispatch(it->second, request);
 }
 
 // HTTP method helpers

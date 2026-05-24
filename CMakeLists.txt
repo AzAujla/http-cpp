@@ -8,5 +8,11 @@ add_subdirectory(src/app)
 add_subdirectory(src/http)
 add_subdirectory(src/utils)
 
-add_executable(server src/main.cpp)
+add_executable(
+  server
+  src/main.cpp
+  src/routes.cpp
+)
+
+target_include_directories(server PRIVATE src)
 target_link_libraries(server PRIVATE app http utils Threads::Threads)

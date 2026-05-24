@@ -1,5 +1,6 @@
 #pragma once
 
+#include "router/router.h"
 #include <arpa/inet.h>
 #include <mutex>
 #include <netinet/in.h>
@@ -17,7 +18,8 @@ private:
   bool retry_port_bind = false;
   int retries_for_port = 5;
   static std::mutex cout_mutex;
-  static void handle_client(int, sockaddr_in);
+  static void handle_client(int, sockaddr_in, std::shared_ptr<const Router>);
+  std::shared_ptr<const Router> router;
 
 public:
   /*
@@ -28,6 +30,8 @@ public:
    * @return Server&
    */
   Server &default_server();
+
+  Server &set_router(std::shared_ptr<const Router> r);
 
   /*
    * Whether to retry binding port if

@@ -1,4 +1,5 @@
 #include "app.h"
+#include "../http/http.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include <arpa/inet.h>
@@ -32,14 +33,21 @@ Server &Server::set_port(int port) {
   return *this;
 }
 
+Server &Server::set_router(std::shared_ptr<const Router> r) {
+  router = r;
+  return *this;
+}
+
 std::mutex Server::cout_mutex;
 
-void Server::handle_client(int client_fd, sockaddr_in client_addr) {
+void Server::handle_client(int client_fd, sockaddr_in client_addr,
+                           std::shared_ptr<const Router> router) {
   char buffer[4096] = {};
   ssize_t bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
 
   if (bytes > 0) {
     const Request request = Request::from_string(buffer);
+    Response response = router->handle(request);
 
 #ifndef NDEBUG
     {
@@ -47,17 +55,10 @@ void Server::handle_client(int client_fd, sockaddr_in client_addr) {
 
       std::cout << inet_ntoa(client_addr.sin_addr) << " "
                 << method_to_string(request.get_method()) << " "
-                << request.get_uri() << "\n";
+                << request.get_full_uri() << " "
+                << status_code_to_string(response.get_code()) << "\n";
     }
 #endif // !NDEBUG
-
-    Response response = Response();
-    if (request.cookies.has("Auth")) {
-      response.set_body("Authenticated with " +
-                        request.cookies.get("Auth").get_value() + "\n");
-    } else {
-      response.set_body("Please login\n");
-    }
 
     std::string response_str = response.build();
     send(client_fd, response_str.c_str(), response_str.size(), 0);
@@ -113,7 +114,7 @@ int Server::run() {
       continue;
     }
 
-    std::thread(handle_client, client_fd, client_addr).detach();
+    std::thread(handle_client, client_fd, client_addr, router).detach();
   }
   close(server_fd);
   return 0;
