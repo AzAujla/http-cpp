@@ -2,7 +2,6 @@
 build/
 
 # Compiled binaries
-server
 *.o
 *.a
 *.so

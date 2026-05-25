@@ -1,5 +1,6 @@
 add_library(app app.cpp)
 add_subdirectory(router)
+add_subdirectory(session)
 
 target_include_directories(app PUBLIC .)
-target_link_libraries(app PRIVATE router)
+target_link_libraries(app PRIVATE router session)

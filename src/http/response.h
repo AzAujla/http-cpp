@@ -12,7 +12,6 @@ class Response {
 private:
   HttpResponseCode code;
   Httpversion version;
-  std::unordered_map<std::string, std::string> headers;
   std::string body = "";
 
 public:
@@ -22,6 +21,7 @@ public:
    * Connection: Close
    */
   Cookies cookies;
+  std::unordered_map<std::string, std::string> headers;
 
   Response();
   std::string build();

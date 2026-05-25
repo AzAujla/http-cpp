@@ -7,11 +7,13 @@ int main() {
                       .default_server()
                       .set_port(8000)
                       .set_retry_port_bind(true)
-                      .set_router(get_routes());
+                      .enable_sessions();
+  server.set_router(get_routes(server.get_session_store()));
 
 #ifndef NDEBUG
   std::cout << "In Debug\n";
 #endif
+
   server.run();
   return 0;
 }

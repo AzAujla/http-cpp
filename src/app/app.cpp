@@ -2,6 +2,8 @@
 #include "../http/http.h"
 #include "../http/request.h"
 #include "../http/response.h"
+#include "router/router.h"
+#include "session/session.h"
 #include <arpa/inet.h>
 #include <iostream>
 #include <mutex>
@@ -41,7 +43,8 @@ Server &Server::set_router(std::shared_ptr<const Router> r) {
 std::mutex Server::cout_mutex;
 
 void Server::handle_client(int client_fd, sockaddr_in client_addr,
-                           std::shared_ptr<const Router> router) {
+                           std::shared_ptr<const Router> router,
+                           std::shared_ptr<SessionStore> session_store) {
   char buffer[4096] = {};
   ssize_t bytes = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
 
@@ -114,8 +117,19 @@ int Server::run() {
       continue;
     }
 
-    std::thread(handle_client, client_fd, client_addr, router).detach();
+    std::thread(handle_client, client_fd, client_addr, router, session_store)
+        .detach();
   }
   close(server_fd);
   return 0;
+}
+
+Server &Server::enable_sessions(int ttl_seconds, int cleanup_interval_seconds) {
+  session_store =
+      std::make_shared<SessionStore>(ttl_seconds, cleanup_interval_seconds);
+  return *this;
+}
+
+std::shared_ptr<SessionStore> Server::get_session_store() const {
+  return session_store;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "router/router.h"
+#include "session/session.h"
 #include <arpa/inet.h>
 #include <mutex>
 #include <netinet/in.h>
@@ -18,8 +19,10 @@ private:
   bool retry_port_bind = false;
   int retries_for_port = 5;
   static std::mutex cout_mutex;
-  static void handle_client(int, sockaddr_in, std::shared_ptr<const Router>);
+  static void handle_client(int, sockaddr_in, std::shared_ptr<const Router>,
+                            std::shared_ptr<SessionStore> session_store);
   std::shared_ptr<const Router> router;
+  std::shared_ptr<SessionStore> session_store;
 
 public:
   /*
@@ -63,4 +66,9 @@ public:
    * Starts the server with the given configuration
    */
   int run();
+
+  Server &enable_sessions(int ttl_seconds = 3600,
+                          int cleanup_interval_seconds = 300);
+
+  std::shared_ptr<SessionStore> get_session_store() const;
 };
